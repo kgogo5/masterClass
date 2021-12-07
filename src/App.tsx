@@ -1,5 +1,7 @@
+import Router from "./Router";
+
 const _ = () => {
-  return <></>;
+  return <Router />;
 };
 
 export default _;
