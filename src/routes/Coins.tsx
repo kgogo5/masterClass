@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet";
 import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
@@ -15,14 +16,14 @@ const Header = styled.header`
 `;
 
 const CoinsList = styled.ul`
-  margin: 0;
+  margin: 2em 0 0;
   padding: 0;
 `;
 
 const Coin = styled.li`
   margin-bottom: 15px;
-  background-color: white;
-  color: ${(porps) => porps.theme.bgColor};
+  background-color: ${(props) => props.theme.textColor};
+  color: ${(props) => props.theme.bgColor};
   border-radius: 15px;
 
   a {
@@ -30,6 +31,7 @@ const Coin = styled.li`
     display: flex;
     transition: color 0.2s ease-in;
     align-items: center;
+    color: ${(props) => props.theme.bgColor};
   }
 
   &:hover {
@@ -80,6 +82,9 @@ const _ = () => {
 
   return (
     <Container>
+      <Helmet>
+        <title>코인</title>
+      </Helmet>
       <Header>
         <Title>코인</Title>
       </Header>

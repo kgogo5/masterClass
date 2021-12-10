@@ -5,6 +5,7 @@ import {
   Route,
   useLocation,
   useParams,
+  useNavigate,
 } from "react-router-dom";
 import styled from "styled-components";
 
@@ -12,6 +13,7 @@ import Price from "./Price";
 import Chart from "./Chart";
 import { useQuery } from "react-query";
 import { fetchCoinInfo, fetchCoinTickers } from "../api";
+import { Helmet } from "react-helmet";
 
 const Container = styled.div`
   padding: 0 20px;
@@ -142,27 +144,45 @@ interface PriceDataInterface {
     };
   };
 }
-interface RouteParams {
-  coinId: string;
-}
-interface RouteState {
-  name: string;
-}
+
+const BackButton = styled.button`
+  position: absolute;
+  left: 1em;
+  top: 1em;
+  width: 30px;
+  height: 30px;
+  font-size: 24px;
+  background: none;
+  font-weight: bold;
+  border: 0;
+  border-radius: 5px;
+  background-color: ${(props) => props.theme.textColor};
+  color: ${(props) => props.theme.bgColor};
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${(props) => props.theme.accentColor};
+  }
+`;
+
 const _ = () => {
-  const { coinId } = useParams<RouteParams>();
-  const { state } = useLocation<RouteState>();
+  const navigate = useNavigate();
+  const { coinId }: any = useParams();
+  const { state } = useLocation();
   const priceMatch = useMatch("/:coinId/price");
   const chartMatch = useMatch("/:coinId/chart");
-  console.log(chartMatch || priceMatch);
-  console.log(typeof coinId);
 
   const { isLoading: infoLoading, data: infoData } = useQuery<InfoInterface>(
     ["info", coinId],
     () => fetchCoinInfo(coinId)
   );
   const { isLoading: tickersLoading, data: tickersData } =
-    useQuery<PriceDataInterface>(["tickers", coinId], () =>
-      fetchCoinTickers(coinId)
+    useQuery<PriceDataInterface>(
+      ["tickers", coinId],
+      () => fetchCoinTickers(coinId),
+      {
+        refetchInterval: 5000,
+      }
     );
 
   const loading = infoLoading || tickersLoading;
@@ -170,6 +190,13 @@ const _ = () => {
   return (
     <>
       <Container>
+        <BackButton onClick={() => navigate("/")}>&#60;</BackButton>
+        <Helmet>
+          <title>
+            코인{" "}
+            {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
+          </title>
+        </Helmet>
         <Header>
           <Title>
             {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
@@ -189,8 +216,8 @@ const _ = () => {
                 <span>{tickersData?.symbol}</span>
               </div>
               <div>
-                <strong>OPEN SOURCE:</strong>
-                <span>{infoData?.open_source ? "Yes" : "No"}</span>
+                <strong>Price:</strong>
+                <span>{tickersData?.quotes.USD.price}</span>
               </div>
             </MainInfo>
             <Description>{infoData?.description}</Description>
@@ -214,8 +241,8 @@ const _ = () => {
             </Tabs>
 
             <Routes>
-              <Route path={`chart`} element={<Chart />} />
-              <Route path={`price`} element={<Price />} />
+              <Route path={`chart`} element={<Chart coinId={coinId} />} />
+              <Route path={`price`} element={<Price coinId={coinId} />} />
             </Routes>
           </>
         )}
