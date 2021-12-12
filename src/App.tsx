@@ -1,6 +1,6 @@
-import Router from "./Router";
 import { createGlobalStyle } from "styled-components";
-import { ReactQueryDevtools } from "react-query/devtools";
+import ToDoList from "./ToDoList";
+
 const GlobalStyle = createGlobalStyle`
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
@@ -63,12 +63,12 @@ a {
   color: inherit;
 }
 `;
+
 const _ = () => {
   return (
     <>
       <GlobalStyle />
-      <Router />
-      <ReactQueryDevtools initialIsOpen={true} />
+      <ToDoList />
     </>
   );
 };
