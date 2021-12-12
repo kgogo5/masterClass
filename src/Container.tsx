@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import styled, { ThemeProvider } from "styled-components";
+import { isDarkAtom } from "./atoms";
 import { darkTheme, lightTheme } from "./theme";
 
 const ThemeChangeButton = styled.button`
@@ -26,14 +27,17 @@ const Wrap = styled.div`
 `;
 
 const _ = ({ children }: any) => {
-  const [darkThemeState, setDarkThemeState] = useState(true);
+  const isDark = useRecoilValue(isDarkAtom);
+  const setIsDark = useSetRecoilState(isDarkAtom);
+
+  const toggleDark = () => setIsDark((prev) => !prev);
 
   return (
     <>
-      <ThemeProvider theme={darkThemeState ? darkTheme : lightTheme}>
+      <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
         <Wrap>
-          <ThemeChangeButton onClick={() => setDarkThemeState(!darkThemeState)}>
-            {darkThemeState ? "Light Theme" : "Dark Theme"}
+          <ThemeChangeButton onClick={() => toggleDark()}>
+            {isDark ? "Light Theme" : "Dark Theme"}
           </ThemeChangeButton>
           {children}
         </Wrap>
