@@ -64,7 +64,7 @@ a {
 }
 `;
 
-const _ = () => {
+const App = () => {
   return (
     <>
       <GlobalStyle />
@@ -73,4 +73,4 @@ const _ = () => {
   );
 };
 
-export default _;
+export default App;
