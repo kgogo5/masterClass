@@ -167,10 +167,17 @@ const BackButton = styled.button`
 
 const _ = () => {
   const navigate = useNavigate();
-  const { coinId }: any = useParams();
+  const { coinParams }: any = useParams();
   const { state } = useLocation();
   const priceMatch = useMatch("/:coinId/price");
   const chartMatch = useMatch("/:coinId/chart");
+  let coinId = coinParams;
+  if (coinParams.indexOf("/crypto") <= 1) {
+    const paramIndex = coinParams.indexOf("/crypto");
+    coinId = coinParams.slice(paramIndex);
+  } else {
+    coinId = coinParams;
+  }
 
   const { isLoading: infoLoading, data: infoData } = useQuery<InfoInterface>(
     ["info", coinId],
