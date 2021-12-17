@@ -1,6 +1,11 @@
 import styled, { createGlobalStyle } from "styled-components";
-import { motion } from "framer-motion";
-import { useRef } from "react";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  useViewportScroll,
+} from "framer-motion";
+import { useEffect } from "react";
 
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
@@ -59,7 +64,7 @@ body {
   font-family: 'Source Sans Pro', sans-serif;
   color:black;
   line-height: 1.2;
-  background:linear-gradient(135deg,#e09,#d0e);
+  background:linear-gradient(135deg,rgb(238, 0, 153),rgb(221, 0, 238));
 }
 a {
   text-decoration:none;
@@ -67,19 +72,9 @@ a {
 }
 `;
 
-const Wrapper = styled.div`
-  height: 100vh;
+const Wrapper = styled(motion.div)`
+  height: 200vh;
   width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const BiggerBox = styled.div`
-  width: 600px;
-  height: 600px;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -94,28 +89,32 @@ const Box = styled(motion.div)`
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
 `;
 
-const boxVariants = {
-  hover: { rotateZ: 90 },
-  click: { borderRadius: "100px" },
-};
-
 const _ = () => {
-  const biggerBoxRef = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const rotateZ = useTransform(x, [-800, 800], [180, -180]);
+  const background = useTransform(
+    x,
+    [-800, 0, 800],
+    [
+      "linear-gradient(135deg,rgb(0, 202, 238),rgb(0, 83, 238))",
+      "linear-gradient(135deg,rgb(238, 0, 153),rgb(221, 0, 238))",
+      "linear-gradient(135deg,rgb(0, 238, 167),rgb(238, 163, 0))",
+    ]
+  );
+  const { scrollYProgress } = useViewportScroll();
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 3]);
+
+  useEffect(() => {
+    // x.onChange(() => console.log(x.get()));
+    rotateZ.onChange(() => console.log(rotateZ.get()));
+    scrollYProgress.onChange(() => console.log(scrollYProgress.get()));
+  }, [rotateZ, scrollYProgress]);
+
   return (
     <>
       <GlobalStyle />
-      <Wrapper>
-        <BiggerBox ref={biggerBoxRef}>
-          <Box
-            drag
-            dragElastic={0.2}
-            dragSnapToOrigin
-            dragConstraints={biggerBoxRef}
-            variants={boxVariants}
-            whileHover="hover"
-            whileTap="click"
-          />
-        </BiggerBox>
+      <Wrapper style={{ background }}>
+        <Box style={{ x, rotateZ, scale }} drag="x" dragSnapToOrigin />
       </Wrapper>
     </>
   );
