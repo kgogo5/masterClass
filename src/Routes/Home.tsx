@@ -20,6 +20,7 @@ const Loader = styled.div`
 
 export const Banner = styled.div<{ bgPhoto: string }>`
   padding: 60px;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -94,7 +95,6 @@ export const Overlay = styled(motion.div)`
 export const BigMovie = styled(motion.div)`
   position: absolute;
   width: 400px;
-  height: 70vh;
   left: 0;
   right: 0;
   margin: 0 auto;
