@@ -139,7 +139,7 @@ function Header() {
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm<IForm>();
   const onValid = (data: IForm) => {
-    navigate(`/search?keyword=${data.keyword}`);
+    navigate(`/nomflix/search?keyword=${data.keyword}`);
   };
   return (
     <Nav variants={navVariants} animate={navAnimation} initial={"top"}>

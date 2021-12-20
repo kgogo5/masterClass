@@ -137,7 +137,7 @@ function Tv() {
   };
   const toggleLeaving = () => setLeaving((prev) => !prev);
   const onBoxClicked = (tvId: string) => {
-    navigate(`/tv/${tvId}`);
+    navigate(`/nomflix/tv/${tvId}`);
   };
   const onOverlayClick = () => navigate("/tv");
   const clickedMovie =

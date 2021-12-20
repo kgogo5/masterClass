@@ -220,9 +220,9 @@ function Home() {
   };
   const toggleLeaving = () => setLeaving((prev) => !prev);
   const onBoxClicked = (movieId: string) => {
-    navigate(`/movies/${movieId}`);
+    navigate(`/nomflix/movies/${movieId}`);
   };
-  const onOverlayClick = () => navigate("/");
+  const onOverlayClick = () => navigate("/nomflix/");
   const clickedMovie =
     bigMovieMatch?.params.movieId &&
     data?.results.find(
