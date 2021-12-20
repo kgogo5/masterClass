@@ -20,7 +20,6 @@ const Loader = styled.div`
 
 export const Banner = styled.div<{ bgPhoto: string }>`
   padding: 60px;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;

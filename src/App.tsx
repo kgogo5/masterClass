@@ -9,13 +9,13 @@ function App() {
     <Router>
       <Header />
       <Routes>
-        <Route path="/" element={<Home />}>
-          <Route path="/movies/:movieId" />
+        <Route path="/nomflix/" element={<Home />}>
+          <Route path="/nomflix/movies/:movieId" />
         </Route>
-        <Route path="/tv" element={<Tv />}>
-          <Route path="/tv/:tvId" />
+        <Route path="/nomflix/tv" element={<Tv />}>
+          <Route path="/nomflix/tv/:tvId" />
         </Route>
-        <Route path="/search" element={<Search />} />
+        <Route path="/nomflix/search" element={<Search />} />
       </Routes>
     </Router>
   );
