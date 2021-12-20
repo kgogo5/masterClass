@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useQuery } from "react-query";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useViewportScroll } from "framer-motion";
 import styled from "styled-components";
 import { getMovies, IGetMoviesResult } from "../api";
 import { makeImagePath } from "../utils";
+import { useNavigate, useMatch } from "react-router-dom";
 
 const Wrapper = styled.div`
   background: black;
@@ -17,7 +18,7 @@ const Loader = styled.div`
   align-items: center;
 `;
 
-const Banner = styled.div<{ bgPhoto: string }>`
+export const Banner = styled.div<{ bgPhoto: string }>`
   padding: 60px;
   height: 100vh;
   display: flex;
@@ -28,23 +29,23 @@ const Banner = styled.div<{ bgPhoto: string }>`
   background-size: cover;
 `;
 
-const Title = styled.h2`
+export const Title = styled.h2`
   font-size: 48px;
 `;
 
-const Overview = styled.p`
+export const Overview = styled.p`
   margin-top: 1em;
   font-size: 18px;
   width: 50%;
   line-height: 1.6;
 `;
 
-const Slider = styled.div`
+export const Slider = styled.div`
   position: relative;
   top: -100px;
 `;
 
-const Row = styled(motion.div)`
+export const Row = styled(motion.div)`
   display: grid;
   gap: 10px;
   grid-template-columns: repeat(6, 1fr);
@@ -52,13 +53,14 @@ const Row = styled(motion.div)`
   width: 100%;
 `;
 
-const Box = styled(motion.div)<{ bgPhoto: string }>`
+export const Box = styled(motion.div)<{ bgPhoto: string }>`
   background-color: white;
   background-image: url(${(props) => props.bgPhoto});
   background-size: cover;
   background-position: center center;
   height: 200px;
   font-size: 66px;
+  cursor: pointer;
 
   &:first-child {
     transform-origin: center left;
@@ -68,7 +70,7 @@ const Box = styled(motion.div)<{ bgPhoto: string }>`
   }
 `;
 
-const Info = styled(motion.div)`
+export const Info = styled(motion.div)`
   padding: 10px;
   background-color: ${(props) => props.theme.black.lighter};
   opacity: 0;
@@ -78,6 +80,83 @@ const Info = styled(motion.div)`
   h4 {
     text-align: center;
     font-size: 12px;
+  }
+`;
+
+export const Overlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+`;
+
+export const BigMovie = styled(motion.div)`
+  position: absolute;
+  width: 400px;
+  height: 70vh;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  border-radius: 15px;
+  overflow: hidden;
+  background-color: ${(props) => props.theme.black.lighter};
+`;
+
+export const BigCover = styled.div`
+  width: 100%;
+  background-size: cover;
+  background-position: center center;
+  height: 300px;
+
+  display: flex;
+  align-items: end;
+`;
+
+export const BigTitle = styled.h3`
+  color: ${(props) => props.theme.white.lighter};
+  padding: 15px 0.5em;
+  font-size: 32px;
+`;
+
+export const BigOverview = styled.p`
+  padding: 1em 2em;
+  position: relative;
+  color: ${(props) => props.theme.white.lighter};
+  line-height: 1.6;
+  max-height: 240px;
+  overflow-y: auto;
+
+  // 스크롤바
+  &::-webkit-scrollbar {
+    width: 6px;
+  } /* 스크롤 바 */
+  &::-webkit-scrollbar-track {
+    background-color: "transparent";
+  } /* 스크롤 바 밑의 배경 */
+
+  &:hover {
+    // 스크롤바
+    &::-webkit-scrollbar {
+      width: 6px;
+    } /* 스크롤 바 */
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    } /* 스크롤 바 밑의 배경 */
+    &::-webkit-scrollbar-thumb {
+      background-color: #e6e6e66f;
+      border-radius: 3px;
+    } /* 실질적 스크롤 바 */
+    &::-webkit-scrollbar-thumb:hover {
+      background: #e6e6e6;
+    } /* 실질적 스크롤 바 위에 마우스를 올려다 둘 때 */
+    &::-webkit-scrollbar-thumb:active {
+      background: #e6e6e6;
+    } /* 실질적 스크롤 바를 클릭할 때 */
+    &::-webkit-scrollbar-button {
+      display: none;
+    } /* 스크롤 바 상 하단 버튼 */
   }
 `;
 
@@ -122,6 +201,9 @@ const infoVariants = {
 const offset = 6;
 
 function Home() {
+  const navigate = useNavigate();
+  const bigMovieMatch = useMatch("/movies/:movieId");
+  const { scrollY } = useViewportScroll();
   const { data, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
     getMovies
@@ -138,6 +220,15 @@ function Home() {
     }
   };
   const toggleLeaving = () => setLeaving((prev) => !prev);
+  const onBoxClicked = (movieId: string) => {
+    navigate(`/movies/${movieId}`);
+  };
+  const onOverlayClick = () => navigate("/");
+  const clickedMovie =
+    bigMovieMatch?.params.movieId &&
+    data?.results.find(
+      (movie) => movie.id === +String(bigMovieMatch.params.movieId)
+    );
   return (
     <Wrapper>
       {isLoading ? (
@@ -167,12 +258,14 @@ function Home() {
                   .slice(offset * index, offset * index + offset)
                   .map((movie) => (
                     <Box
+                      layoutId={movie.id + ""}
                       key={movie.id}
                       bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
                       variants={boxVariants}
                       whileHover="hover"
                       initial="normal"
                       transition={{ type: "tween" }}
+                      onClick={() => onBoxClicked(movie.id + "")}
                     >
                       <Info variants={infoVariants}>
                         <h4>{movie.title}</h4>
@@ -182,6 +275,38 @@ function Home() {
               </Row>
             </AnimatePresence>
           </Slider>
+          <AnimatePresence>
+            {bigMovieMatch ? (
+              <>
+                <Overlay
+                  onClick={onOverlayClick}
+                  exit={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                />
+                <BigMovie
+                  style={{ top: scrollY.get() + 100 }}
+                  layoutId={bigMovieMatch.params.movieId}
+                >
+                  {clickedMovie && (
+                    <>
+                      <BigCover
+                        style={{
+                          backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
+                            clickedMovie.backdrop_path,
+                            "w500"
+                          )})`,
+                        }}
+                      >
+                        <BigTitle>{clickedMovie.title}</BigTitle>
+                      </BigCover>
+
+                      <BigOverview>{clickedMovie.overview}</BigOverview>
+                    </>
+                  )}
+                </BigMovie>
+              </>
+            ) : null}
+          </AnimatePresence>
         </>
       )}
     </Wrapper>
